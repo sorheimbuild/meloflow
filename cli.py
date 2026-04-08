@@ -13,7 +13,7 @@ import click
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from lucida_simple import lucida_download, lucida_download_album, load_history, BANNER, C, G, Y, R, B, D, N, parse_quality_options, check_alternate_services, verify_audio_file, get_existing_files
+from melo_simple import lucida_download, lucida_download_album, load_history, BANNER, C, G, Y, R, B, D, N, parse_quality_options, check_alternate_services, verify_audio_file, get_existing_files
 
 DEFAULT_OUTPUT = os.getenv("DOWNLOAD_DIR", "./downloads")
 
@@ -70,7 +70,7 @@ def download(url, output, timeout, quality, file_path, parallel, retries, no_inf
         
         if verify:
             print(f"\n  {C}--- Verifying Album Files ---{N}")
-            from lucida_simple import scan_album_folder, get_album_manifest
+            from melo_simple import scan_album_folder, get_album_manifest
             import json
             
             # Try to find album folder
@@ -125,7 +125,7 @@ def download(url, output, timeout, quality, file_path, parallel, retries, no_inf
         print(f"  {C}|{N} AutoRetry: {'No' if no_auto_retry else 'Yes (' + str(pause) + 's pause)'}\n")
         
         if fix_order:
-            from lucida_simple import fix_album_track_order
+            from melo_simple import fix_album_track_order
             album_path = Path(out)
             existing_dirs = [d for d in album_path.iterdir() if d.is_dir() and not d.name.startswith('.')]
             if existing_dirs:
@@ -156,14 +156,14 @@ def download(url, output, timeout, quality, file_path, parallel, retries, no_inf
             print(f"\n  {Y}{failed_count} tracks failed, will retry...{N}")
         
         if embed_metadata and r.success:
-            from lucida_simple import embed_album_track_numbers
+            from melo_simple import embed_album_track_numbers
             album_path = Path(r.filepath) if r.filepath else Path(out)
             print(f"\n  {C}Embedding track numbers in metadata...{N}")
             count = embed_album_track_numbers(album_path)
             print(f"  {G}Updated {count} files with track numbers{N}")
         
         if lyrics and r.success:
-            from lucida_simple import fetch_album_lyrics
+            from melo_simple import fetch_album_lyrics
             album_path = Path(r.filepath) if r.filepath else Path(out)
             print(f"\n  {C}Fetching lyrics from lyrics.ovh...{N}")
             count = fetch_album_lyrics(album_path)
@@ -246,7 +246,7 @@ def search(query, service, output, parallel):
         meloflow search "Daft Punk"
         meloflow search "Get Lucky" -s tidal
     """
-    from lucida_simple import search_lucida, SERVICES, lucida_download, lucida_download_album
+    from melo_simple import search_lucida, SERVICES, lucida_download, lucida_download_album
     
     print(f"\n  {C}Search Music{N}")
     print(f"  {C}================{N}\n")
@@ -361,7 +361,7 @@ def search(query, service, output, parallel):
 @cli.command()
 def history():
     """Show download history"""
-    from lucida_simple import show_history
+    from melo_simple import show_history
     show_history()
 
 
@@ -396,7 +396,7 @@ def sort(folder, prefix):
         meloflow sort "~/Music/My Album"
         meloflow sort "~/Music/My Album" --prefix
     """
-    from lucida_simple import sort_album_tracks
+    from melo_simple import sort_album_tracks
     
     if not folder:
         print(f"\n  {Y}Error: Folder path required{N}\n")
@@ -430,7 +430,7 @@ def fix_order(url, output, discs):
         meloflow fix-order https://tidal.com/album/123456
         meloflow fix-order https://tidal.com/album/123456 --discs 2
     """
-    from lucida_simple import fix_album_track_order
+    from melo_simple import fix_album_track_order
     
     out = os.path.expanduser(output)
     album_path = Path(out)
@@ -460,7 +460,7 @@ def verify(output):
         meloflow verify
         meloflow verify -o ~/Music
     """
-    from lucida_simple import scan_album_folder, verify_audio_file
+    from melo_simple import scan_album_folder, verify_audio_file
     
     out = os.path.expanduser(output)
     

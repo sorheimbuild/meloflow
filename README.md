@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="lucida_flow.png" alt="Meloflow Logo" width="600"/>
+  <img src="meloflow.png" alt="Meloflow Logo" width="600"/>
   
   # Meloflow
   

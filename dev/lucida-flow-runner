@@ -1,2 +1,0 @@
-#!/bin/bash
-python ~/AppData/Local/Python/pythoncore-3.14-64/Scripts/lucida-flow.py "$@"
