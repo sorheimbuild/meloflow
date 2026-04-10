@@ -325,10 +325,10 @@ def search(query, service, output, parallel):
             total_pages = display_results(current_items, 1)
             
             if show_type == 'both':
-                print(f"\n  {D}[A]{G} albums {D}| [T]{G} tracks {D}| [N]{G} next {D}| [P]{G} prev {D}| [Q]{G} quit{N}")
+                print(f"\n  {D}[A]{G} albums {D}| [T]{G} tracks {D}| [N]{G} next {D}| [P]{G} prev {D}| [F]{G} filter {D}| [Q]{G} quit{N}")
                 print(f"  {D}Type number to download | Currently viewing: {G}{current_view.upper()}{N}")
             else:
-                print(f"\n  {D}[N]{G} next {D}| [P]{G} prev {D}| [Q]{G} quit {D}| [R]{G} new search{N}")
+                print(f"\n  {D}[N]{G} next {D}| [P]{G} prev {D}| [Q]{G} quit {D}| [R]{G} new search {D}| [F]{G} filter{N}")
                 print(f"  {D}Type number to download{N}")
             
             cmd = input(f"\n  {G}Command:{N} ").strip().lower()
@@ -341,6 +341,13 @@ def search(query, service, output, parallel):
                 pass  # Will show prev page below
             elif cmd == 'r':
                 return 'restart'
+            elif cmd.startswith('filter:') or cmd.startswith('f:'):
+                # Get new search term
+                new_query = cmd.split(':', 1)[1].strip() if ':' in cmd else cmd[2:].strip()
+                if new_query:
+                    return ('filter', new_query)
+                else:
+                    print(f"  {Y}Usage: filter:<term> or f:<term>{N}")
             elif cmd == 'a' and show_type == 'both':
                 current_view = 'albums'
                 current_items = albums
@@ -370,12 +377,29 @@ def search(query, service, output, parallel):
             else:
                 print(f"  {Y}Unknown command{N}")
     
-    if show_type == 'albums':
-        browse_results(albums, 'albums')
-    elif show_type == 'tracks':
-        browse_results(tracks, 'tracks')
-    else:
-        browse_results(albums, 'both')
+    while True:
+        if show_type == 'albums':
+            result = browse_results(albums, 'albums')
+        elif show_type == 'tracks':
+            result = browse_results(tracks, 'tracks')
+        else:
+            result = browse_results(albums, 'both')
+        
+        if result == 'restart':
+            return
+        elif result and isinstance(result, tuple) and result[0] == 'filter':
+            new_query = result[1]
+            print(f"\n  {C}Filtering for: {B}{new_query}{N}")
+            new_results = search_lucida(new_query, service=service)
+            if new_results:
+                albums = [r for r in new_results if r['type'] == 'Album']
+                tracks = [r for r in new_results if r['type'] == 'Track']
+                print(f"  {G}Found {len(albums)} albums, {len(tracks)} tracks{N}")
+            else:
+                print(f"  {Y}No results found{N}")
+                return
+        else:
+            break
     
     print(f"\n  {C}Done!{N}\n")
 
